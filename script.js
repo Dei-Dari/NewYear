@@ -1,4 +1,4 @@
-// Unit 2. Объект. Массивы. Строки. Введение в ООПЗадание 2
+﻿// Unit 2. Объект. Массивы. Строки. Введение в ООПЗадание 2
 // Рассчитайте, сколько дней, часов, минут и секунд осталось до Нового года.
 // часы на заметку
 // https://habr.com/ru/post/171015/
@@ -18,69 +18,92 @@ var date = new Date();  //системное время
 
 var newYear = new Date(date.getFullYear() + 1, 0, 1);
 
-var request = new XMLHttpRequest();
-request.open('GET', 'http://worldtimeapi.org/api/timezone/Asia/Yekaterinburg', false);
-request.send(); //срабатывает не с первого раза
-if (request.status == 200) {
-  let requestTime = request.responseText; // получаем текст ответа
-  let time = new Date(JSON.parse(requestTime).datetime); // получаем время
+// var request = new XMLHttpRequest();
+// request.open('GET', 'http://worldtimeapi.org/api/timezone/Asia/Yekaterinburg', false);
+// request.send();
+// if (request.status == 200) {
+//   let requestTime = request.responseText; // получаем текст ответа
+//   let time = new Date(JSON.parse(requestTime).datetime); // получаем время
 
-  var secDelta = time.getSeconds() - date.getSeconds();
-  var minDelta = time.getMinutes() - date.getMinutes();
-}
+//   var secDelta = time.getSeconds() - date.getSeconds();
+//   var minDelta = time.getMinutes() - date.getMinutes();
+// }
+
+// глобальные переменные
+let secDelta, minDelta;
+
+const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+const apiUrl = "http://worldtimeapi.org/api/timezone/Asia/Yekaterinburg";
+
+const xhr = new XMLHttpRequest();
+xhr.open("GET", proxyUrl + apiUrl, true);
+xhr.onload = function () {
+    if (xhr.status === 200) {
+        let requestTime = xhr.responseText; // текст ответа
+        let time = new Date(JSON.parse(requestTime).datetime); // время
+        secDelta = time.getSeconds() - date.getSeconds();
+        minDelta = time.getMinutes() - date.getMinutes();
+        console.log(xhr.responseText);
+    } else {
+        console.error("Ошибка запроса:", xhr.status);
+    }
+};
+xhr.onerror = function () {
+    console.error("Ошибка сети");
+};
+xhr.send();
 
 
 function currentTime() {
-  var date = new Date();  //системное время
- 
- 
-  var day = date.getDate();
-  var month = date.getMonth() + 1;
-  var year = date.getFullYear();
-  // коррекция минуты секунды к системному от первоначального запроса
-  date.setMinutes(date.getMinutes() + minDelta);
-  date.setSeconds(date.getSeconds() + secDelta);
-
-  if (newYear == date)
-  {
-    newYear.setFullYear += 1; //??пересчет на новый год
-  }
-  
-  var time = newYear - date;
-  
-
-  var timeUntilNY = Math.abs(Math.floor(time / 1000));	//sec
-  var dayUntilNY = Math.floor(timeUntilNY / (60 * 60 * 24));	//day
-  var hourUntilNY = Math.floor((timeUntilNY - dayUntilNY * (60 * 60 * 24)) / (60 * 60));	//hour
-  var minUntilNY = Math.floor((timeUntilNY - dayUntilNY * (60 * 60 * 24) - hourUntilNY * (60 * 60)) / 60);	//min
-  var secUntilNY = Math.floor(timeUntilNY - dayUntilNY * (60 * 60 * 24) - hourUntilNY * (60 * 60) - minUntilNY * 60);	//se	
+    var date = new Date();  //системное время
 
 
-  var hour = date.getHours();
-  var min = date.getMinutes();
-  var sec = date.getSeconds();
-  hour = updateTime(hour);
-  min = updateTime(min);
-  sec = updateTime(sec);
+    var day = date.getDate();
+    var month = date.getMonth() + 1;
+    var year = date.getFullYear();
+    // коррекция минуты секунды к системному от первоначального запроса
+    date.setMinutes(date.getMinutes() + minDelta);
+    date.setSeconds(date.getSeconds() + secDelta);
 
-  hourUntilNY = updateTime(hourUntilNY);
-  minUntilNY = updateTime(minUntilNY);
-  secUntilNY = updateTime(secUntilNY);
+    if (newYear == date) {
+        newYear.setFullYear += 1; //??пересчет на новый год
+    }
 
-  //document.getElementById("date").innerText = newYear + " " + day + "." + month + "." + year + '\n';
-  document.getElementById("dateNow").innerText = day + "." + month + "." + year + '\n' + hour + " : " + min + " : " + sec;
-  document.getElementById("timeUntil").innerText = "до Нового Года" + '\n' + dayUntilNY + " дней " + hourUntilNY + " : " + minUntilNY + " : " + secUntilNY;
-  var t = setTimeout(function () { currentTime() }, 1000);
+    var time = newYear - date;
+
+
+    var timeUntilNY = Math.abs(Math.floor(time / 1000));	//sec
+    var dayUntilNY = Math.floor(timeUntilNY / (60 * 60 * 24));	//day
+    var hourUntilNY = Math.floor((timeUntilNY - dayUntilNY * (60 * 60 * 24)) / (60 * 60));	//hour
+    var minUntilNY = Math.floor((timeUntilNY - dayUntilNY * (60 * 60 * 24) - hourUntilNY * (60 * 60)) / 60);	//min
+    var secUntilNY = Math.floor(timeUntilNY - dayUntilNY * (60 * 60 * 24) - hourUntilNY * (60 * 60) - minUntilNY * 60);	//se	
+
+
+    var hour = date.getHours();
+    var min = date.getMinutes();
+    var sec = date.getSeconds();
+    hour = updateTime(hour);
+    min = updateTime(min);
+    sec = updateTime(sec);
+
+    hourUntilNY = updateTime(hourUntilNY);
+    minUntilNY = updateTime(minUntilNY);
+    secUntilNY = updateTime(secUntilNY);
+
+    //document.getElementById("date").innerText = newYear + " " + day + "." + month + "." + year + '\n';
+    document.getElementById("dateNow").innerText = day + "." + month + "." + year + '\n' + hour + " : " + min + " : " + sec;
+    document.getElementById("timeUntil").innerText = "до Нового Года" + '\n' + dayUntilNY + " дней " + hourUntilNY + " : " + minUntilNY + " : " + secUntilNY;
+    var t = setTimeout(function () { currentTime() }, 1000);
 }
 
 //приведение к полному виду 00
 function updateTime(k) {
-  if (k < 10) {
-    return "0" + k;
-  }
-  else {
-    return k;
-  }
+    if (k < 10) {
+        return "0" + k;
+    }
+    else {
+        return k;
+    }
 }
 
 currentTime();
@@ -115,192 +138,192 @@ var ns6 = document.getElementById && !document.all
 var browserok = ie5 || ns6 || opera */
 
 function randommaker(range) {
-  rand = Math.floor(range * Math.random())
-  return rand
+    rand = Math.floor(range * Math.random())
+    return rand
 }
 
 function initsnow() {
-  /* if (ie5 || opera) {
-    marginbottom = document.body.scrollHeight
-    marginright = document.body.clientWidth - 15
-  }
-  else */
-  if (ns6) {
-    marginbottom = document.body.scrollHeight
-    marginright = window.innerWidth - 15
-  } 
+    /* if (ie5 || opera) {
+      marginbottom = document.body.scrollHeight
+      marginright = document.body.clientWidth - 15
+    }
+    else */
+    if (ns6) {
+        marginbottom = document.body.scrollHeight
+        marginright = window.innerWidth - 15
+    }
 
-  var snowsizerange = snowmaxsize - snowminsize
-  for (i = 0; i <= snowmax; i++) {
-    crds[i] = 0;
-    lftrght[i] = Math.random() * 15;
-    x_mv[i] = 0.03 + Math.random() / 10;
-    snow[i] = document.getElementById("s" + i)
-    snow[i].style.fontFamily = snowtype[randommaker(snowtype.length)]
-    snow[i].size = randommaker(snowsizerange) + snowminsize
-    snow[i].style.fontSize = snow[i].size + 'px';
-    snow[i].style.color = snowcolor[randommaker(snowcolor.length)]
-    snow[i].style.zIndex = 1000
-    snow[i].sink = sinkspeed * snow[i].size / 5
-    if (snowingzone == 1) { snow[i].posx = randommaker(marginright - snow[i].size) }
-    if (snowingzone == 2) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) }
-    if (snowingzone == 3) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 4 }
-    if (snowingzone == 4) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 2 }
-    snow[i].posy = randommaker(2 * marginbottom - marginbottom - 2 * snow[i].size)
-    snow[i].style.left = snow[i].posx + 'px';
-    snow[i].style.top = snow[i].posy + 'px';
-  }
-  movesnow()
+    var snowsizerange = snowmaxsize - snowminsize
+    for (i = 0; i <= snowmax; i++) {
+        crds[i] = 0;
+        lftrght[i] = Math.random() * 15;
+        x_mv[i] = 0.03 + Math.random() / 10;
+        snow[i] = document.getElementById("s" + i)
+        snow[i].style.fontFamily = snowtype[randommaker(snowtype.length)]
+        snow[i].size = randommaker(snowsizerange) + snowminsize
+        snow[i].style.fontSize = snow[i].size + 'px';
+        snow[i].style.color = snowcolor[randommaker(snowcolor.length)]
+        snow[i].style.zIndex = 1000
+        snow[i].sink = sinkspeed * snow[i].size / 5
+        if (snowingzone == 1) { snow[i].posx = randommaker(marginright - snow[i].size) }
+        if (snowingzone == 2) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) }
+        if (snowingzone == 3) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 4 }
+        if (snowingzone == 4) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 2 }
+        snow[i].posy = randommaker(2 * marginbottom - marginbottom - 2 * snow[i].size)
+        snow[i].style.left = snow[i].posx + 'px';
+        snow[i].style.top = snow[i].posy + 'px';
+    }
+    movesnow()
 }
 
 function movesnow() {
-  for (i = 0; i <= snowmax; i++) {
-    crds[i] += x_mv[i];
-    snow[i].posy += snow[i].sink
-    snow[i].style.left = snow[i].posx + lftrght[i] * Math.sin(crds[i]) + 'px';
-    snow[i].style.top = snow[i].posy + 'px';
+    for (i = 0; i <= snowmax; i++) {
+        crds[i] += x_mv[i];
+        snow[i].posy += snow[i].sink
+        snow[i].style.left = snow[i].posx + lftrght[i] * Math.sin(crds[i]) + 'px';
+        snow[i].style.top = snow[i].posy + 'px';
 
-    if (snow[i].posy >= marginbottom - 2 * snow[i].size || parseInt(snow[i].style.left) > (marginright - 3 * lftrght[i])) {
-      if (snowingzone == 1) { snow[i].posx = randommaker(marginright - snow[i].size) }
-      if (snowingzone == 2) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) }
-      if (snowingzone == 3) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 4 }
-      if (snowingzone == 4) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 2 }
-      snow[i].posy = 0
+        if (snow[i].posy >= marginbottom - 2 * snow[i].size || parseInt(snow[i].style.left) > (marginright - 3 * lftrght[i])) {
+            if (snowingzone == 1) { snow[i].posx = randommaker(marginright - snow[i].size) }
+            if (snowingzone == 2) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) }
+            if (snowingzone == 3) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 4 }
+            if (snowingzone == 4) { snow[i].posx = randommaker(marginright / 2 - snow[i].size) + marginright / 2 }
+            snow[i].posy = 0
+        }
     }
-  }
-  var timer = setTimeout("movesnow()", 50)
+    var timer = setTimeout("movesnow()", 50)
 }
 
 for (i = 0; i <= snowmax; i++) {
-  document.write("<span id='s" + i + "' style='position:absolute;top:-" + snowmaxsize + "'>" + snowletter + "</span>")
+    document.write("<span id='s" + i + "' style='position:absolute;top:-" + snowmaxsize + "'>" + snowletter + "</span>")
 }
 //if (browserok) {
-  window.onload = initsnow
-//}
+window.onload = initsnow
+    //}
 
 
-//снежинки Коха
+    //снежинки Коха
 
-(function () {
-  if (document.createElement('canvas').getContext) {
-    if (document.readyState === 'complete')
-      snow();
-    else
-      window.addEventListener('DOMContentLoaded', snow, false);
-  }
-  else {
-    return;
-  }
+    (function () {
+        if (document.createElement('canvas').getContext) {
+            if (document.readyState === 'complete')
+                snow();
+            else
+                window.addEventListener('DOMContentLoaded', snow, false);
+        }
+        else {
+            return;
+        }
 
-  var deg = Math.PI / 180;
-  var maxflakes = 20; var flakes = []; var scrollspeed = 64; var snowspeed = 500;
-  var canvas, sky;
-  var snowingTimer;
-  var invalidateMeasure = false;
+        var deg = Math.PI / 180;
+        var maxflakes = 20; var flakes = []; var scrollspeed = 64; var snowspeed = 500;
+        var canvas, sky;
+        var snowingTimer;
+        var invalidateMeasure = false;
 
-  var strokes = ["#6cf", "#9cf", "#99f", "#ccf", "#66f", "#3cf"];
+        var strokes = ["#6cf", "#9cf", "#99f", "#ccf", "#66f", "#3cf"];
 
-  function rand(n) {
-    return Math.floor(n * Math.random());
-  }
+        function rand(n) {
+            return Math.floor(n * Math.random());
+        }
 
-  // Запуск снегопада
-  function snow() {
-    canvas = document.createElement('canvas');
-    canvas.style.position = 'fixed';
-    canvas.style.top = '0px';
-    canvas.style.left = '0px';
-    canvas.style.zIndex = '-10';
+        // Запуск снегопада
+        function snow() {
+            canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed';
+            canvas.style.top = '0px';
+            canvas.style.left = '0px';
+            canvas.style.zIndex = '-10';
 
-    document.body.insertBefore(canvas, document.body.firstChild);
-    sky = canvas.getContext('2d');
+            document.body.insertBefore(canvas, document.body.firstChild);
+            sky = canvas.getContext('2d');
 
-    ResetCanvas();
+            ResetCanvas();
 
-    snowingTimer = setInterval(createSnowflake, snowspeed);
-    setInterval(moveSnowflakes, scrollspeed);
-    window.addEventListener('resize', ResetCanvas, false);
-  }
+            snowingTimer = setInterval(createSnowflake, snowspeed);
+            setInterval(moveSnowflakes, scrollspeed);
+            window.addEventListener('resize', ResetCanvas, false);
+        }
 
-  // Сброс размеров Canvas
-  function ResetCanvas() {
-    invalidateMeasure = true;
-    canvas.width = document.body.offsetWidth;
-    canvas.height = window.innerHeight;
-  }
+        // Сброс размеров Canvas
+        function ResetCanvas() {
+            invalidateMeasure = true;
+            canvas.width = document.body.offsetWidth;
+            canvas.height = window.innerHeight;
+        }
 
-  // Отрисовка кривой Коха
-  function leg(n, len) {
-    sky.save();       // Сохраняем текущую трансформацию
-    if (n == 0) {      // Нерекурсивный случай - отрисовываем линию
-      sky.lineTo(len, 0);
-    }
-    else {
-      sky.scale(1 / 3, 1 / 3);  // Уменьшаем масштаб в 3 раза
-      leg(n - 1, len); sky.rotate(60 * deg);
-      leg(n - 1, len); sky.rotate(-120 * deg);
-      leg(n - 1, len); sky.rotate(60 * deg); leg(n - 1, len);
-    }
-    sky.restore();      // Восстанавливаем трансформацию
-    sky.translate(len, 0); // переходим в конец ребра
-  }
+        // Отрисовка кривой Коха
+        function leg(n, len) {
+            sky.save();        // Сохраняем текущую трансформацию
+            if (n == 0) {      // Нерекурсивный случай - отрисовываем линию
+                sky.lineTo(len, 0);
+            }
+            else {
+                sky.scale(1 / 3, 1 / 3);  // Уменьшаем масштаб в 3 раза
+                leg(n - 1, len); sky.rotate(60 * deg);
+                leg(n - 1, len); sky.rotate(-120 * deg);
+                leg(n - 1, len); sky.rotate(60 * deg); leg(n - 1, len);
+            }
+            sky.restore();      // Восстанавливаем трансформацию
+            sky.translate(len, 0); // переходим в конец ребра
+        }
 
-  // Отрисовка снежинки Коха
-  function drawFlake(x, y, angle, len, n, stroke, fill) {
-    sky.save(); sky.strokeStyle = stroke;
-    sky.fillStyle = fill;
-    sky.beginPath();
-    sky.translate(x, y);
-    sky.moveTo(0, 0); sky.rotate(angle);
-    leg(n, len);
-    sky.rotate(-120 * deg);
-    leg(n, len); sky.rotate(-120 * deg);
-    leg(n, len); sky.closePath();
-    sky.fill();
-    sky.stroke();
-    sky.restore();
-  }
+        // Отрисовка снежинки Коха
+        function drawFlake(x, y, angle, len, n, stroke, fill) {
+            sky.save(); sky.strokeStyle = stroke;
+            sky.fillStyle = fill;
+            sky.beginPath();
+            sky.translate(x, y);
+            sky.moveTo(0, 0); sky.rotate(angle);
+            leg(n, len);
+            sky.rotate(-120 * deg);
+            leg(n, len); sky.rotate(-120 * deg);
+            leg(n, len); sky.closePath();
+            sky.fill();
+            sky.stroke();
+            sky.restore();
+        }
 
-  // Создание пула снежинок
-  function createSnowflake() {
-    var order = 2 + rand(2);
-    var size = 10 * order + rand(10);
-    var x = rand(document.body.offsetWidth);
-    var y = window.pageYOffset;
-    var stroke = strokes[rand(strokes.length)];
+        // Создание пула снежинок
+        function createSnowflake() {
+            var order = 2 + rand(2);
+            var size = 10 * order + rand(10);
+            var x = rand(document.body.offsetWidth);
+            var y = window.pageYOffset;
+            var stroke = strokes[rand(strokes.length)];
 
-    flakes.push({ x: x, y: y, vx: 0, vy: 3 + rand(3), angle: 0, size: size, order: order, stroke: stroke, fill: 'transparent' });
+            flakes.push({ x: x, y: y, vx: 0, vy: 3 + rand(3), angle: 0, size: size, order: order, stroke: stroke, fill: 'transparent' });
 
-    if (flakes.length > maxflakes) clearInterval(snowingTimer);
-  }
+            if (flakes.length > maxflakes) clearInterval(snowingTimer);
+        }
 
-  // Перемещение снежинок
-  function moveSnowflakes() {
-    sky.clearRect(0, 0, canvas.width, canvas.height);
+        // Перемещение снежинок
+        function moveSnowflakes() {
+            sky.clearRect(0, 0, canvas.width, canvas.height);
 
-    var maxy = canvas.height;
+            var maxy = canvas.height;
 
-    for (var i = 0; i < flakes.length; i++) {
-      var flake = flakes[i];
+            for (var i = 0; i < flakes.length; i++) {
+                var flake = flakes[i];
 
-      flake.y += flake.vy;
-      flake.x += flake.vx;
+                flake.y += flake.vy;
+                flake.x += flake.vx;
 
-      if (flake.y > maxy) flake.y = 0;
-      if (invalidateMeasure) {
-        flake.x = rand(canvas.width);
-      }
+                if (flake.y > maxy) flake.y = 0;
+                if (invalidateMeasure) {
+                    flake.x = rand(canvas.width);
+                }
 
-      drawFlake(flake.x, flake.y, flake.angle, flake.size, flake.order, flake.stroke, flake.fill);
+                drawFlake(flake.x, flake.y, flake.angle, flake.size, flake.order, flake.stroke, flake.fill);
 
-      // Иногда меняем боковой ветер
-      if (rand(4) == 1) flake.vx += (rand(11) - 5) / 10;
-      if (flake.vx > 2) flake.vx = 2;
-      if (flake.vx < -2) flake.vx = -2;
-      if (rand(3) == 1) flake.angle = (rand(13) - 6) / 271;
-    }
-    if (invalidateMeasure) invalidateMeasure = false;
-  }
-}());
+                // Иногда меняем боковой ветер
+                if (rand(4) == 1) flake.vx += (rand(11) - 5) / 10;
+                if (flake.vx > 2) flake.vx = 2;
+                if (flake.vx < -2) flake.vx = -2;
+                if (rand(3) == 1) flake.angle = (rand(13) - 6) / 271;
+            }
+            if (invalidateMeasure) invalidateMeasure = false;
+        }
+    }());
 
 
